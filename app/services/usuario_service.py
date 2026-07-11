@@ -2,8 +2,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.models import Usuario
-from app.schemas.schemas import UsuarioCreate
-from app.core.security import gerar_hash_senha
+from app.schemas.schemas import UsuarioCreate, LoginRequest
+from app.core.security import gerar_hash_senha, verificar_senha
 
 
 def cadastrar_usuario(db: Session, usuario: UsuarioCreate) -> Usuario:
@@ -22,3 +22,12 @@ def cadastrar_usuario(db: Session, usuario: UsuarioCreate) -> Usuario:
     db.refresh(novo_usuario)
 
     return novo_usuario
+
+
+def autenticar_usuario(db: Session, dados: LoginRequest):
+    usuario = (db.query(Usuario)).filter(Usuario.email == dados.email).first()
+    if usuario is None:
+        raise HTTPException(status_code=401, detail="Email ou senha inválidos.")
+    
+    if not verificar_senha(dados.senha, usuario.senha):
+        raise HTTPException(status_code=401, detail="Email ou senha inválidos.")
