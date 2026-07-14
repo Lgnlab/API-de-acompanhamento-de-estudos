@@ -1,11 +1,10 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-import jwt
+from jose import jwt, JWTError
 from dotenv import load_dotenv
 import os
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.models.models import Usuario
@@ -40,13 +39,13 @@ def criar_token(dados: dict) -> str:
     return token
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/autenticacao/login")
 
 def verificar_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except (ExpiredSignatureError, InvalidTokenError):
+    except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Não foi possível validar as credenciais.")
 
 def get_usuario_atual(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):

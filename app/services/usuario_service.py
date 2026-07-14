@@ -24,10 +24,12 @@ def cadastrar_usuario(db: Session, usuario: UsuarioCreate) -> Usuario:
     return novo_usuario
 
 
-def autenticar_usuario(db: Session, dados: LoginRequest):
-    usuario = (db.query(Usuario)).filter(Usuario.email == dados.email).first()
+def autenticar_usuario(db, dados):
+    usuario = (db.query(Usuario)).filter(Usuario.email == dados.username).first()
     if usuario is None:
         raise HTTPException(status_code=401, detail="Email ou senha inválidos.")
     
-    if not verificar_senha(dados.senha, usuario.senha):
+    if not verificar_senha(dados.password, usuario.senha):
         raise HTTPException(status_code=401, detail="Email ou senha inválidos.")
+    
+    return usuario
