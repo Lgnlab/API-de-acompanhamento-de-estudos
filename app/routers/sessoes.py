@@ -28,3 +28,19 @@ def listar_sessoes(usuario: Usuario = Depends(get_usuario_atual), db: Session = 
     sessoes = (db.query(SessaoEstudo).join(Materia).filter(Materia.usuario_id == usuario.id).all())
 
     return sessoes  
+
+
+@router.patch("/{sessao_id}", response_model=SessaoEstudoResponse)
+def concluir_sessao(sessao_id: int, usuario: Usuario = Depends(get_usuario_atual), db: Session = Depends(get_db)):
+    sessao = (db.query(SessaoEstudo).filter(SessaoEstudo.id == sessao_id).first())
+    if sessao is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sessão não encontrada.")
+    if sessao.materia.usuario_id != usuario.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Você não tem permissão para acessar esta sessão.")
+    
+    sessao.concluida = True
+
+    db.commit()
+    db.refresh(sessao)
+
+    return sessao
