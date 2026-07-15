@@ -59,3 +59,11 @@ class TokenResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class RelatorioHorasMateriaResponse(BaseModel):
+    materia: str
+    total_horas: float
+
+    class Config:
+        from_attributes = True
