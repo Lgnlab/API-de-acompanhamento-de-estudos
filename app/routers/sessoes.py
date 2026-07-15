@@ -37,6 +37,9 @@ def concluir_sessao(sessao_id: int, usuario: Usuario = Depends(get_usuario_atual
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sessão não encontrada.")
     if sessao.materia.usuario_id != usuario.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Você não tem permissão para acessar esta sessão.")
+    sessao.concluida = True
+    if sessao.concluida:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Esta sessão já foi concluída.")
     
     sessao.concluida = True
 
