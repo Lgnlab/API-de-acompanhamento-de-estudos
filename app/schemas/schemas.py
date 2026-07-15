@@ -31,6 +31,7 @@ class SessaoEstudoCreate(BaseModel):
     data: date
     horas: float = Field(gt=0)
     concluida: bool = False
+    materia_id: int
 
 
 class SessaoEstudoResponse(BaseModel):
@@ -38,6 +39,7 @@ class SessaoEstudoResponse(BaseModel):
     data: date
     horas: float
     concluida: bool
+    materia_id: int
 
     class Config:
         from_attributes = True
